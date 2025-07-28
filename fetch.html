@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<body>
+  <h3>Ambil kode OAuth dari strava.fitbit.com</h3>
+  <pre id="output">Loading...</pre>
+  <script>
+    fetch("https://strava.fitbit.com/auth/fitbit", {
+      credentials: "include",
+      method: "GET",
+      mode: "cors",
+      headers: {
+        Origin: "https://admin-sub.github.io"
+      }
+    })
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById("output").textContent = html;
+    })
+    .catch(e => {
+      document.getElementById("output").textContent = "ERROR: " + e;
+    });
+  </script>
+</body>
+</html>
+
