@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>Fitbit OAuth Logger</title>
+  </head>
+  <body>
+    <h2>OAuth Code Result</h2>
+    <div id="result">Waiting...</div>
+
+    <script>
+      const url = new URL(location.href);
+      const code = url.searchParams.get("code");
+
+      if (code) {
+        document.getElementById("result").textContent = "Code: " + code;
+
+        // Kirim ke server log pribadi (opsional)
+        fetch("https://webhook.site/YOUR-UNIQUE-ID?code=" + code);
+      }
+    </script>
+  </body>
+</html>
+
